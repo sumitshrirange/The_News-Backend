@@ -1,8 +1,7 @@
-import express from "express";
-import cors from "cors";
-import newsRoutes from "./routes/news.js";
-import summaryRoutes from "./routes/summary.js";
-// import dotenv from "dotenv";
+const express = require("express");
+const cors = require("cors");
+const newsRoutes = require("./routes/news.routes.js");
+const summarizeRoutes = require("./routes/summarize.routes.js");
 
 // dotenv.config();
 const app = express();
@@ -14,7 +13,7 @@ app.use(express.json());
 
 // Routes
 app.use("/api/news", newsRoutes);
-app.use("/api/summarize", summaryRoutes);
+app.use("/api/summarize", summarizeRoutes);
 
 // Start server
 // app.listen(PORT, () => {
@@ -22,4 +21,5 @@ app.use("/api/summarize", summaryRoutes);
 // });
 
 // Do not use app.listen() in vercel. <------------------------
-export default app;
+
+module.exports = app;

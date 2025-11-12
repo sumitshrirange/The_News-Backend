@@ -1,65 +1,13 @@
 // -------------------------------------- Using Gemini API - [Fast] ------------------------------------------------ //
 
-import express from "express";
-import axios from "axios";
-import { Readability } from "@mozilla/readability";
-import { JSDOM } from "jsdom";
-import OpenAI from "openai";
-import dotenv from "dotenv";
-
-dotenv.config();
+const express = require("express");
+const summarization = require("../controllers/summarize.controller");
 
 const router = express.Router();
 
-const client = new OpenAI({
-  apiKey: process.env.GEMINI_API_KEY,
-  baseURL: "https://generativelanguage.googleapis.com/v1beta/openai/",
-});
+router.post("/", summarization);
 
-router.post("/", async (req, res) => {
-  try {
-    const { url } = req.body;
-    if (!url) return res.status(400).json({ error: "URL is required" });
-
-    const { data: html } = await axios.get(url, {
-      headers: { "User-Agent": "Mozilla/5.0" },
-    });
-
-    const dom = new JSDOM(html, { url });
-    dom.window.document
-      .querySelectorAll("style, script")
-      .forEach((el) => el.remove());
-    const article = new Readability(dom.window.document).parse();
-
-    if (!article?.textContent)
-      return res.status(400).json({ error: "Could not parse article" });
-
-    const prompt = `Summarize this news article in 3–5 short paragraphs:\n\n${article.textContent.slice(
-      0,
-      2000
-    )}`;
-
-    const completion = await client.chat.completions.create({
-      model: "gemini-2.0-flash",
-      messages: [
-        { role: "system", content: "You are a helpful assistant." },
-        { role: "user", content: prompt },
-      ],
-      max_tokens: 500,
-      temperature: 0.7,
-    });
-
-    const summary =
-      completion.choices[0]?.message?.content ?? "No summary generated.";
-
-    res.json({ title: article.title, summary, url });
-  } catch (err) {
-    console.error("Error summarizing:", err);
-    res.status(500).json({ error: "Failed to summarize article" });
-  }
-});
-
-export default router;
+module.exports = router;
 
 // -------------------------------------- Using JS Package (@xenova/transformers) - [Slow] ---------------------------------------------- //
 

@@ -1,14 +1,10 @@
-import express from "express";
-import axios from "axios";
-import dotenv from "dotenv"
-dotenv.config()
-
-const router = express.Router();
+const axios = require("axios");
+const dotenv = require("dotenv");
+dotenv.config();
 
 const API_KEY = process.env.SERP_API_KEY;
 
-// GET /api/news/:topicToken
-router.get("/:topicToken", async (req, res) => {
+const getNews = async (req, res) => {
   try {
     const { topicToken } = req.params;
 
@@ -26,6 +22,6 @@ router.get("/:topicToken", async (req, res) => {
     console.error("Error fetching SerpApi news:", error.message);
     res.status(500).json({ error: "Failed to fetch news" });
   }
-});
+};
 
-export default router;
+module.exports = getNews;
