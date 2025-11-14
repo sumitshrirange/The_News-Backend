@@ -15,11 +15,7 @@ const app = express();
 // const PORT = process.env.PORT;
 
 // Middleware
-app.use(cors({
-  origin: ["http://localhost:5173", "https://thenews-two.vercel.app"],
-  credentials: true,
-}));
-app.options("*", cors());
+app.use(cors()); // Allow frontend requests from any origin (or restrict to the frontend URL)
 app.use(express.json());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
