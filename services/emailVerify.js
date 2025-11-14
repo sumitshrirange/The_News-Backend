@@ -1,26 +1,13 @@
-const nodemailer = require("nodemailer");
-const dotenv = require("dotenv");
-dotenv.config();
+const { Resend } = require("resend");
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 const verifyEmail = async (token, email) => {
-  const transporter = nodemailer.createTransport({
-    host: "smtp.gmail.com",
-    port: 465,
-    secure: true,
-    auth: {
-      user: process.env.MAIL_USER,
-      pass: process.env.MAIL_PASS,
-    },
-    tls: {
-      rejectUnauthorized: false,
-    },
-  });
-
-  const mailConfigurations = {
-    from: process.env.MAIL_USER,
-    to: email,
-    subject: "Email Verification",
-    html: `
+  try {
+    await resend.emails.send({
+      from: "Acme <onboarding@resend.dev>",
+      to: email,
+      subject: "Verify Your Email",
+      html: `
       <h1>Verify Your Email Address</h1>
       <p>Hello,</p>
       <p>Thank you for registering on <b>The News</b>. To complete your signup process and activate your account, please verify your email by clicking the button below.</p>
@@ -34,15 +21,11 @@ const verifyEmail = async (token, email) => {
       </p>
       <p>If you did not initiate this request, you can safely ignore this email.</p>
     `,
-  };
+    });
 
-  try {
-    const info = await transporter.sendMail(mailConfigurations);
-    console.log("Email sent successfully:", info.messageId);
-    return true;
+    console.log("Verification email sent");
   } catch (error) {
-    console.error("Email sending failed:", error);
-    return false;
+    console.log("Error sending verification email:", error);
   }
 };
 
