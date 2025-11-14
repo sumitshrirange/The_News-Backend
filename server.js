@@ -1,6 +1,6 @@
 const express = require("express");
 const cors = require("cors");
-const dotenv = require("dotenv")
+// const dotenv = require("dotenv")
 const connectDB = require("./config/db.js");
 
 const authRoutes = require("./routes/auth.routes");
@@ -8,7 +8,7 @@ const userRoutes = require("./routes/user.routes");
 const newsRoutes = require("./routes/news.routes.js");
 const summarizeRoutes = require("./routes/summarize.routes.js");
 
-dotenv.config();
+// dotenv.config();
 connectDB();
 
 const app = express();
@@ -16,7 +16,7 @@ const app = express();
 
 // Middleware
 app.use(cors({
-  origin: ["http://localhost:5173", process.env.FRONTEND_URL],
+  origin: ["http://localhost:5173", "https://thenews-two.vercel.app"],
   credentials: true,
 }));
 app.options("*", cors());
