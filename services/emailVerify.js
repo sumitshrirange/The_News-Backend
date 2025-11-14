@@ -11,22 +11,39 @@ const verifyEmail = async (token, email) => {
       user: process.env.MAIL_USER,
       pass: process.env.MAIL_PASS,
     },
+    tls: {
+      rejectUnauthorized: false,
+    },
   });
 
   const mailConfigurations = {
     from: process.env.MAIL_USER,
     to: email,
     subject: "Email Verification",
-    html: `<h1>Verify Your Email Address</h1> <br> <p>Hello,</p> <br> <p>Thank you for registering on our <b>The News</b>. To complete your signup process and activate your account, please verify your email address by clicking the button below.</p> <br> <p style="text-align: center; color: #fff;"> <a href="${process.env.FRONTEND_URL}/verify/${token}" target="_blank" style="display: inline-block; padding: 12px 24px; background-color: #00a63d; color: #fff !important; text-decoration: none; border-radius: 5px; font-weight: bold;">Verify Your Email</a></p> <br> <p>If you did not initiate this request, you can safely ignore this email.`,
+    html: `
+      <h1>Verify Your Email Address</h1>
+      <p>Hello,</p>
+      <p>Thank you for registering on <b>The News</b>. To complete your signup process and activate your account, please verify your email by clicking the button below.</p>
+      <p style="text-align: center;">
+        <a href="${process.env.FRONTEND_URL}/verify/${token}"
+           target="_blank"
+           style="display: inline-block; padding: 12px 24px; background-color: #00a63d; 
+                  color: white; text-decoration: none; border-radius: 5px; font-weight: bold;">
+          Verify Your Email
+        </a>
+      </p>
+      <p>If you did not initiate this request, you can safely ignore this email.</p>
+    `,
   };
 
-  transporter.sendMail(mailConfigurations, function (error, info) {
-    if (error) {
-      throw new Error(error);
-    }
-    console.log("Email sent successfully");
-    console.log(info);
-  });
+  try {
+    const info = await transporter.sendMail(mailConfigurations);
+    console.log("Email sent successfully:", info.messageId);
+    return true;
+  } catch (error) {
+    console.error("Email sending failed:", error);
+    return false;
+  }
 };
 
 module.exports = verifyEmail;
