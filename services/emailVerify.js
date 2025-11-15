@@ -1,23 +1,20 @@
-const nodemailer = require("nodemailer");
-const dotenv = require("dotenv");
-dotenv.config();
+const axios = require("axios");
+require("dotenv").config();
 
 const verifyEmail = async (token, email) => {
-  const transporter = nodemailer.createTransport({
-    host: "smtp.gmail.com",
-    port: 587,
-    secure: false,
-    auth: {
-      user: process.env.MAIL_USER,
-      pass: process.env.MAIL_PASS,
-    }
-  });
-
-  const mailConfigurations = {
-    from: process.env.MAIL_USER,
-    to: email,
-    subject: "Email Verification",
-    html: `
+  try {
+    const data = {
+      from: {
+        email: process.env.MAIL_USER,
+        name: "The News",
+      },
+      to: [
+        {
+          email,
+        },
+      ],
+      subject: "Email Verification",
+      html:  `
       <h1>Verify Your Email Address</h1>
       <p>Hello,</p>
       <p>Thank you for registering on <b>The News</b>. To complete your signup process and activate your account, please verify your email by clicking the button below.</p>
@@ -31,14 +28,24 @@ const verifyEmail = async (token, email) => {
       </p>
       <p>If you did not initiate this request, you can safely ignore this email.</p>
     `,
-  };
+    };
 
-  try {
-    const info = await transporter.sendMail(mailConfigurations);
-    console.log("Email sent successfully:", info.messageId);
+    const response = await axios.post(
+      "https://api.mailersend.com/v1/email",
+      data,
+      {
+        headers: {
+          "Authorization": `Bearer ${process.env.MAILERSEND_API_KEY}`,
+          "Content-Type": "application/json",
+        }
+      }
+    );
+
+    console.log("Mailersend sent:", response.data);
     return true;
-  } catch (error) {
-    console.error("Email sending failed:", error);
+
+  } catch (err) {
+    console.log("Mailersend error:", err.response?.data || err.message);
     return false;
   }
 };
