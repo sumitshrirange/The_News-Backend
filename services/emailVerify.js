@@ -2,19 +2,16 @@ const axios = require("axios");
 require("dotenv").config();
 
 const verifyEmail = async (token, email) => {
+  const url = "https://api.elasticemail.com/v2/email/send";
+
   try {
-    const data = {
-      from: {
-        email: process.env.MAIL_USER,
-        name: "The News",
-      },
-      to: [
-        {
-          email,
-        },
-      ],
-      subject: "Email Verification",
-      html:  `
+    const response = await axios.post(url, {
+      params: {
+        apikey: process.env.ELASTIC_API,
+        subject: "Verify your Email",
+        to: email,
+        from: process.env.MAIL_USER,
+        bodyHtml: encodeURIComponent(`
       <h1>Verify Your Email Address</h1>
       <p>Hello,</p>
       <p>Thank you for registering on <b>The News</b>. To complete your signup process and activate your account, please verify your email by clicking the button below.</p>
@@ -27,25 +24,14 @@ const verifyEmail = async (token, email) => {
         </a>
       </p>
       <p>If you did not initiate this request, you can safely ignore this email.</p>
-    `,
-    };
+    `),
+      },
+    });
 
-    const response = await axios.post(
-      "https://api.mailersend.com/v1/email",
-      data,
-      {
-        headers: {
-          "Authorization": `Bearer ${process.env.MAILERSEND_API_KEY}`,
-          "Content-Type": "application/json",
-        }
-      }
-    );
-
-    console.log("Mailersend sent:", response.data);
+    console.log("Elastic Email Response:", response.data);
     return true;
-
   } catch (err) {
-    console.log("Mailersend error:", err.response?.data || err.message);
+    console.log("Elastic Email Error:", err.response?.data || err);
     return false;
   }
 };
