@@ -16,18 +16,14 @@ module.exports = (passport) => {
       async function (accessToken, refreshToken, profile, done) {
         console.log("User Profile Data:", profile);
         try {
-          const user = await User.findOneAndUpdate(
-            { email: profile.emails[0].value },
-            {
-              name: profile.displayName,
-              email: profile.emails[0].value,
-              picture: profile.photos[0].value,
-              password: null,
-              isLoggedIn: true,
-              isVerified: true,
-            },
-            { upsert: true, new: true }
-          );
+          const user = User.create({
+            name: profile.displayName,
+            email: profile.emails[0].value,
+            picture: profile.photos[0].value,
+            password: null,
+            isLoggedIn: true,
+            isVerified: true,
+          });
           done(null, user);
         } catch (error) {
           done(error, null);
