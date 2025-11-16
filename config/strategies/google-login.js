@@ -30,7 +30,6 @@ module.exports = (passport) => {
               name: profile.displayName,
               email: userEmail,
               picture: profile.photos[0].value,
-              password: null,
               isLoggedIn: true,
               isVerified: true,
             });

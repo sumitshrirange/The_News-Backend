@@ -13,7 +13,10 @@ const userSchema = new mongoose.Schema(
     },
     password: {
       type: String,
-      required: true,
+      required: function () {
+        return this.authStrategy === "local";
+      },
+      select: false,
     },
     picture: {
       type: String,
