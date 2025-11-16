@@ -6,7 +6,12 @@ const googleCallback = (req, res) => {
       expiresIn: "1h",
     });
 
-    res.cookie("token", token);
+    res.cookie("token", token, {
+    httpOnly: true,
+    secure: true,
+    sameSite: 'None',
+    maxAge: 3600000
+});
 
     res.redirect(
       `${process.env.FRONTEND_URL}/success-login?access_token=${token}`
