@@ -12,21 +12,32 @@ module.exports = (passport) => {
         clientID: process.env.GOOGLE_CLIENT_ID,
         clientSecret: process.env.GOOGLE_CLIENT_SECRET,
         callbackURL: process.env.CALLBACK_URL,
+        scope: ["profile", "email"],
       },
       async function (accessToken, refreshToken, profile, done) {
-        console.log("User Profile Data:", profile);
         try {
-          const user = User.create({
-            name: profile.displayName,
-            email: profile.emails[0].value,
-            picture: profile.photos[0].value,
-            password: null,
-            isLoggedIn: true,
-            isVerified: true,
-          });
-          done(null, user);
+          const userEmail = profile.emails[0].value;
+          let user = await User.findOne({ email: userEmail });
+
+          if (user) {
+            if (!user.isLoggedIn) {
+              user.isLoggedIn = true;
+              await user.save();
+            }
+            return done(null, user);
+          } else {
+            const newUser = await User.create({
+              name: profile.displayName,
+              email: userEmail,
+              picture: profile.photos[0].value,
+              isLoggedIn: true,
+              isVerified: true,
+            });
+            return done(null, newUser);
+          }
         } catch (error) {
-          done(error, null);
+          console.error("Error during Google strategy processing:", error);
+          return done(error, null);
         }
       }
     )
