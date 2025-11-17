@@ -21,22 +21,26 @@ const app = express();
 // const PORT = process.env.PORT;
 
 // Middleware
+const allowedOrigins = ["http://localhost:5173"];
+if (process.env.FRONTEND_URL) {
+  allowedOrigins.push(process.env.FRONTEND_URL);
+}
 app.use(
   cors({
-    origin: ["http://localhost:5173", `${process.env.FRONTEND_URL}`],
+    origin: allowedOrigins,
     credentials: true,
   })
 );
 app.use(
-    session({
-        secret: process.env.SESSION_SECRET,
-        resave: false,
-        saveUninitialized: false,
-        cookie: {
-            sameSite: process.env.NODE_ENV === "production" ? "none" : "lax", 
-            secure: process.env.NODE_ENV === "production" ? true : false, 
-        },
-    })
+  session({
+    secret: process.env.SESSION_SECRET,
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+      secure: process.env.NODE_ENV === "production" ? true : false,
+    },
+  })
 );
 app.use(cookieParser());
 app.use(express.json());

@@ -60,7 +60,7 @@ const logout = async (req, res) => {
     }
 
     const userId = req.user._id;
-    await User.findByIdAndUpdate(userId, { isLoggedIn: false });
+    await User.findByIdAndUpdate(userId, { isLoggedIn: false, token: null });
 
     res.clearCookie("token");
 
