@@ -20,6 +20,10 @@ router.get(
   authController.getUser
 );
 
-router.post("/logout", authController.logout);
+router.post(
+  "/logout",
+  passport.authenticate("jwt", { session: false }),
+  authController.logout
+);
 
 module.exports = router;
