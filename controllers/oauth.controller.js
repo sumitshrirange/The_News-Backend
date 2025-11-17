@@ -1,4 +1,5 @@
 const jwt = require("jsonwebtoken");
+const User = require("../models/user.model");
 
 const googleCallback = (req, res) => {
   try {
@@ -25,24 +26,21 @@ const googleCallback = (req, res) => {
 const getUser = (req, res) => {
   try {
     if (!req.user) {
-      return res.status(401).json({ 
+      return res.status(401).json({
         success: false,
-        message: "User not authenticated"
+        message: "User not authenticated",
       });
     }
 
-    const token = jwt.sign(
-      { id: req.user._id },
-      process.env.JWT_SECRET,
-      { expiresIn: "30d" }
-    );
+    const token = jwt.sign({ id: req.user._id }, process.env.JWT_SECRET, {
+      expiresIn: "30d",
+    });
 
     return res.json({
       success: true,
       user: req.user,
       token,
     });
-
   } catch (error) {
     console.error("Error fetching user details", error);
     return res.status(500).json({
@@ -52,4 +50,30 @@ const getUser = (req, res) => {
   }
 };
 
-module.exports = { googleCallback, getUser };
+const logout = async (req, res) => {
+  try {
+    if (!req.user) {
+      return res.status(401).json({
+        success: false,
+        message: "User not authenticated",
+      });
+    }
+
+    const userId = req.user._id;
+    await User.findByIdAndUpdate(userId, { isLoggedIn: false });
+
+    res.clearCookie("token");
+
+    return res.status(200).json({
+      success: true,
+      message: "Logged out successfully",
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+module.exports = { googleCallback, getUser, logout };
