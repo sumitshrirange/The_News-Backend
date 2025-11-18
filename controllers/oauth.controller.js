@@ -4,14 +4,14 @@ const User = require("../models/user.model");
 const googleCallback = (req, res) => {
   try {
     const token = jwt.sign({ sub: req.user._id }, process.env.JWT_SECRET, {
-      expiresIn: "1h",
+      expiresIn: "30d",
     });
 
     res.cookie("token", token, {
       httpOnly: true,
       secure: true,
       sameSite: "None",
-      maxAge: 3600000,
+      maxAge: 2592000000, // 30 days
     });
 
     res.redirect(
