@@ -20,7 +20,9 @@ const summarization = async (req, res) => {
       headers: { "User-Agent": "Mozilla/5.0" },
     });
 
-    const dom = new JSDOM(html, { url });
+    const cleanedHtml = html.replace(/<style[\s\S]*?<\/style>/gi, "");
+
+    const dom = new JSDOM(cleanedHtml, { url });
     dom.window.document
       .querySelectorAll("style, script")
       .forEach((el) => el.remove());
