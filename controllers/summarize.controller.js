@@ -37,7 +37,7 @@ const summarization = async (req, res) => {
     )}`;
 
     const completion = await client.chat.completions.create({
-      model: "gemini-2.0-flash",
+      model: "gemini-2.5-flash-lite",
       messages: [
         { role: "system", content: "You are a helpful assistant." },
         { role: "user", content: prompt },
